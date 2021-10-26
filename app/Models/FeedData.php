@@ -35,8 +35,8 @@ class FeedData
             $fundName = $fundData->name->en;
             $res[$fundId] = [
                 "name" => "$fundName($fundId)",
-                "series" => [],
-                "aum" => $fundData->aum
+                "aum" => $fundData->aum,
+                "series" => []
             ];
             foreach ($series as $seriesId => $seriesData) {
                 $latestNav = $seriesData->latest_nav ?? null;
@@ -45,7 +45,7 @@ class FeedData
                 if (!$date) continue;
                 $res[$fundId]['series'][$seriesId] = [];
                 if ($date < $this->current_date) {
-                    $res[$fundId]['series'][$seriesId] = $seriesData;
+                    $res[$fundId]['series'][$seriesId]['latest_nav'] = $latestNav;
                 }
                 else {
                     unset($res[$fundId]['series'][$seriesId]);
@@ -54,5 +54,18 @@ class FeedData
             if (!count($res[$fundId]["series"])) unset($res[$fundId]);
         }
         return $res;
+    }
+
+    public function updateData ($newDate, array $newData) {
+        foreach ($newData as $fundId => $datum) {
+            if ($this->data->$fundId ?? null) {
+                $this->data->$fundId->aum = $datum['aum'];
+                $newSeries = $datum['series'];
+                foreach ($newSeries as $seriesId => $newSeriesData) {
+                    $this->data->$fundId->series->$seriesId->latest_nav->date = $newDate;
+                    $this->data->$fundId->series->$seriesId->latest_nav->value = $newSeriesData['latest_nav']['value'];
+                }
+            }
+        }
     }
 }
