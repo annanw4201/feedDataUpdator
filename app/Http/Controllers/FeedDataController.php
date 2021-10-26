@@ -15,7 +15,10 @@ class FeedDataController extends Controller
     }
 
     public function index(Request $request) {
-
-        return view("feed_data", ["data" => $this->feedDataService->getFeedData()]);
+        $data = [];
+        $feedData = $this->feedDataService->getFeedData();
+        $data["staleData"] = $feedData->getStaleData();
+        $data["feedData"] = $feedData->data();
+        return view("feed_data", ["data" => json_encode($data)]);
     }
 }
