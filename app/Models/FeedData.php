@@ -9,10 +9,14 @@ class FeedData
 
     private $data = null, $current_date = null;
 
-    public function __construct($data)
+    public function __construct($data, $date = "2020-11-26")
     {
         $this->data = $data ?? (object)[];
-        $this->current_date = Carbon::createFromFormat("Y-m-d", "2020-11-26");
+        $this->current_date = Carbon::createFromFormat("Y-m-d", $date);
+    }
+
+    public function currentDate() {
+        return $this->current_date->format('Y-m-d');
     }
 
     public function json() {
