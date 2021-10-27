@@ -139,4 +139,64 @@ class FeedDataTest extends \Tests\TestCase
         ];
         self::assertEquals($staleData, $feedData->getStaleData());
     }
+
+    public function testUpdateData() {
+        $testDataObject = json_decode(json_encode($this->testData));
+
+        $cur_date = "2021-01-01";
+        $feedData = new FeedData($testDataObject, $cur_date);
+
+        $newDate = "2021-10-28";
+        $newData = [
+            "fund1" => [
+                "aum" => 3000,
+                "name" => "Test Fund1(fund1)",
+                "series" => [
+                    "A" => [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 150
+                        ]
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ],
+            "fund2" => [
+                "aum" => 9000,
+                "name" => "Test Fund2(fund2)",
+                "series" => [
+                    "ETF" => [
+                        "latest_nav" => [
+                            "date" => '2021-10-24',
+                            "value" => 700
+                        ]
+                    ],
+                    "F" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-24',
+                            "value" => 720
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $feedData->updateData($newDate, $newData);
+        $feedDataArr = $feedData->toArray();
+        self::assertEquals($newData['fund1']['aum'], $feedDataArr['fund1']["aum"]);
+        self::assertEquals($newDate, $feedDataArr['fund1']['series']['A']['latest_nav']['date']);
+        self::assertEquals($newData['fund1']['series']['A']['latest_nav']['value'], $feedDataArr['fund1']['series']['A']['latest_nav']['value']);
+        self::assertEquals($newDate, $feedDataArr['fund1']['series']['B']['latest_nav']['date']);
+        self::assertEquals($newData['fund1']['series']['B']['latest_nav']['value'], $feedDataArr['fund1']['series']['B']['latest_nav']['value']);
+
+        self::assertEquals($newData['fund2']['aum'], $feedDataArr['fund2']["aum"]);
+        self::assertEquals($newDate, $feedDataArr['fund2']['series']['ETF']['latest_nav']['date']);
+        self::assertEquals($newData['fund2']['series']['ETF']['latest_nav']['value'], $feedDataArr['fund2']['series']['ETF']['latest_nav']['value']);
+        self::assertEquals($newDate, $feedDataArr['fund2']['series']['F']['latest_nav']['date']);
+        self::assertEquals($newData['fund2']['series']['F']['latest_nav']['value'], $feedDataArr['fund2']['series']['F']['latest_nav']['value']);
+    }
 }
