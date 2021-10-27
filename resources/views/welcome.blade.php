@@ -37,8 +37,10 @@
                 </div>
             @endif
 
-            <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-                <div class="button"><a href="/app" class="underline text-gray-900 dark:text-white">Welcome</a></div>
+            <div class="jumbotron col-md-12 text-center">
+                <h1 class="display-4">Feed Data Updating Tool</h1>
+                <hr class="my-4">
+                <a class="btn btn-primary btn-lg" href="/app" role="button">Start</a>
             </div>
         </div>
         <script async src="{{ asset('js/app.js') }}"></script>
