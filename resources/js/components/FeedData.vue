@@ -12,7 +12,15 @@
                             </div>
                             <input required type="date" class="form-control" id="new-date" placeholder="New Date" v-model="newDate">
                         </div>
-                        <button class="btn btn-info" type="submit" v-on:click.preventDefault="submitForm()">Submit</button>
+                        <button class="btn btn-info" type="submit" v-on:click.preventDefault="submitForm()">
+                            <template v-if="loading">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                Processing...
+                            </template>
+                            <template v-else>
+                                Submit
+                            </template>
+                        </button>
                     </div>
 
                     <template v-for="(fundData, fundId) in staleData">
@@ -20,14 +28,20 @@
                             <div class="card-body">
                                 <div class="form-group row">
                                     <label :for="fundId" class="col-sm-4 col-form-label">{{ fundData.name }}</label>
-                                    <div class="col-sm-4">
+                                    <div class="input-group col-sm-4">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">AUM</div>
+                                        </div>
                                         <input type="number" step="any" class="form-control" :id="fundId" :placeholder="'AUM: ' + fundData.aum" v-model="fundData.aum">
                                     </div>
                                     <div class="col-sm-4"></div>
                                     <template v-for="(seriesData, seriesId) in fundData.series">
                                         <div class="col-sm-4"></div>
                                         <label :for="seriesId" class="col-sm-4 col-form-label">{{ seriesId }}</label>
-                                        <div class="col-sm-4">
+                                        <div class="input-group col-sm-4">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">NAV</div>
+                                            </div>
                                             <input type="number" step="any" class="form-control" :id="seriesId" :placeholder="'NAV: ' + seriesData.latest_nav.value" v-model="seriesData.latest_nav.value">
                                         </div>
                                     </template>
@@ -54,6 +68,7 @@ export default {
         return {
             staleData: this.data.staleData ?? {},
             newDate: moment().format('YYYY-MM-DD'),
+            loading: false
         }
     },
     mounted() {
@@ -69,10 +84,23 @@ export default {
                     newDate: this.newDate
                 },
                 api = "/api/app/feed_data/update_stale_data";
-            axios.post(api, request).then(response => {
-                console.log(response.data);
-                window.alert("Update successfully. Check generated CSV and JSON files on server.");
-            })
+            this.loading = true;
+            axios.post(api, request)
+                .then(response => {
+                    console.log(response.data);
+                    window.alert("Update successfully. Check generated CSV and JSON files on server.");
+                })
+                .catch(error => {
+                    if (error?.response) {
+                        let errors = error.response.data?.errors,
+                            msg = errors ? errors[Object.keys(errors)?.[0]] : null;
+                        window.alert(msg ?? error.response.data?.message ?? error.response?.statusText ?? "There are some errors.");
+                    }
+                    console.log(error);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         }
     }
 }
