@@ -2,7 +2,7 @@
 
 A simple tool for user to grab the feed data from AWS with Laravel Backend and display the stale data on the Frontend by using Vue.js.
 
-## Build
+## Build & Run
 
 - Install php7.2 or higher on the machine (MacOS has a default php. Install php if needed.)
 - Install composer globally with following script, see the [link](https://getcomposer.org/doc/00-intro.md) for details
@@ -30,6 +30,7 @@ A simple tool for user to grab the feed data from AWS with Laravel Backend and d
   - `php artisan key:generate`
   - `php artisan serve`
 - Go to the page here: http://127.0.0.1:8000
+- Generated CSV, JSON files are located at the `./public`, these files are prepended with unix timestamp
 
 ## Assumptions
 
