@@ -39,20 +39,24 @@ class FeedData
 
     public function getStaleData() {
         $res = [];
+        if (!$this->data()) return $res;
         foreach ($this->data as $fundId => $fundData) {
             $series = $fundData->series ?? null;
-            if (!$series) continue;
-            $fundName = $fundData->name->en;
+            $aum = $fundData->aum ?? null;
+            $name = $fundData->name ?? null;
+            $enName = $name->en ?? null;
+            if (is_null($series) || is_null($aum) || is_null($name) || is_null($enName)) continue;
             $res[$fundId] = [
-                "name" => "$fundName($fundId)",
-                "aum" => $fundData->aum,
+                "name" => "$enName($fundId)",
+                "aum" => $aum,
                 "series" => []
             ];
             foreach ($series as $seriesId => $seriesData) {
                 $latestNav = $seriesData->latest_nav ?? null;
                 if (!$latestNav) continue;
                 $date = Carbon::parse($latestNav->date) ?? null;
-                if (!$date) continue;
+                $value = $latestNav->value ?? null;
+                if (!$date || is_null($value)) continue;
                 $res[$fundId]['series'][$seriesId] = [];
                 if ($date->lt($this->stale_date)) {
                     $res[$fundId]['series'][$seriesId]['latest_nav'] = (array)$latestNav;

@@ -199,4 +199,214 @@ class FeedDataTest extends \Tests\TestCase
         self::assertEquals($newDate, $feedDataArr['fund2']['series']['F']['latest_nav']['date']);
         self::assertEquals($newData['fund2']['series']['F']['latest_nav']['value'], $feedDataArr['fund2']['series']['F']['latest_nav']['value']);
     }
+
+    public function testUndefinedData() {
+        // missing fund attribute
+        $wrongData = [
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        self::assertEquals([], $feedData->getStaleData());
+
+        // missing fund->series attribute
+        $wrongData = [
+            "fund1" => [
+                "aum" => 2000,
+                "name" => ["en" => "Test Fund1"],
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        self::assertEquals([], $feedData->getStaleData());
+
+        // missing fund->aum attribute
+        $wrongData = [
+            "fund1" => [
+                "name" => ["en" => "Test Fund1"],
+                "series" => [
+                    "A" => [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 100
+                        ]
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        self::assertEquals([], $feedData->getStaleData());
+
+        // missing fund->name attribute
+        $wrongData = [
+            "fund1" => [
+                "aum" => 2000,
+                "series" => [
+                    "A" => [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 100
+                        ]
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        self::assertEquals([], $feedData->getStaleData());
+
+        // missing fund->name->en attribute
+        $wrongData = [
+            "fund1" => [
+                "name" => ["fr" => "Test Fund1"],
+                "aum" => 2000,
+                "series" => [
+                    "A" => [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 100
+                        ]
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        self::assertEquals([], $feedData->getStaleData());
+
+
+        // missing A->latest_nav attribute
+        $wrongData = [
+            "fund1" => [
+                "name" => ["en" => "Test Fund1"],
+                "aum" => 2000,
+                "series" => [
+                    "A" => [
+
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        $staleData = [
+            "fund1" => [
+                "aum" => 2000,
+                "name" => "Test Fund1(fund1)",
+                "series" => [
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        self::assertEquals($staleData, $feedData->getStaleData());
+
+        // missing A->latest_nav->date attribute
+        $wrongData = [
+            "fund1" => [
+                "name" => ["en" => "Test Fund1"],
+                "aum" => 2000,
+                "series" => [
+                    "A" => [
+                        "value" => 100
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        $staleData = [
+            "fund1" => [
+                "aum" => 2000,
+                "name" => "Test Fund1(fund1)",
+                "series" => [
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        self::assertEquals($staleData, $feedData->getStaleData());
+
+        // missing A->latest_nav->value attribute
+        $wrongData = [
+            "fund1" => [
+                "name" => ["en" => "Test Fund1"],
+                "aum" => 2000,
+                "series" => [
+                    "A" => [
+                        "date" => '2021-10-26',
+                    ],
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        $testDataObject = json_decode(json_encode($wrongData));
+        $cur_date = "2021-10-29";
+        $feedData = new FeedData($testDataObject, $cur_date);
+        $staleData = [
+            "fund1" => [
+                "aum" => 2000,
+                "name" => "Test Fund1(fund1)",
+                "series" => [
+                    "B" =>  [
+                        "latest_nav" => [
+                            "date" => '2021-10-26',
+                            "value" => 120
+                        ]
+                    ],
+                ]
+            ]
+        ];
+        self::assertEquals($staleData, $feedData->getStaleData());
+    }
 }
