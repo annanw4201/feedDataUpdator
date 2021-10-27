@@ -7,12 +7,18 @@ use Carbon\Carbon;
 class FeedData
 {
 
-    private $data = null, $current_date = null;
+    private $data = null, $current_date = null, $stale_date = null;
 
     public function __construct($data, $date = "2020-11-26")
     {
         $this->data = $data ?? (object)[];
-        $this->current_date = Carbon::createFromFormat("Y-m-d", $date);
+        // assuming current date is 2020-11-26, stale date is yesterday's date: 2020-11-25
+        $this->current_date = Carbon::parse($date);
+        $this->stale_date = Carbon::parse($this->current_date)->sub('1 day');
+    }
+
+    public function staleDate() {
+        return $this->stale_date->format('Y-m-d');
     }
 
     public function currentDate() {
@@ -28,7 +34,7 @@ class FeedData
     }
 
     public function toArray() {
-        return (array)$this->data;
+        return json_decode($this->json(), true);
     }
 
     public function getStaleData() {
@@ -45,11 +51,11 @@ class FeedData
             foreach ($series as $seriesId => $seriesData) {
                 $latestNav = $seriesData->latest_nav ?? null;
                 if (!$latestNav) continue;
-                $date = Carbon::createFromFormat('Y-m-d', $latestNav->date) ?? null;
+                $date = Carbon::parse($latestNav->date) ?? null;
                 if (!$date) continue;
                 $res[$fundId]['series'][$seriesId] = [];
-                if ($date < $this->current_date) {
-                    $res[$fundId]['series'][$seriesId]['latest_nav'] = $latestNav;
+                if ($date->lt($this->stale_date)) {
+                    $res[$fundId]['series'][$seriesId]['latest_nav'] = (array)$latestNav;
                 }
                 else {
                     unset($res[$fundId]['series'][$seriesId]);
