@@ -4,14 +4,30 @@ A simple tool for user to grab the feed data from AWS with Laravel Backend and d
 
 ## Build
 
-- Install php7.4 or higher on the machine
-- Install composer, see the [link](https://getcomposer.org/doc/00-intro.md)
-- Install NVM see [here](https://github.com/nvm-sh/nvm)
-- Install nodejs and npm by running `nvm install node`
+- Install php7.2 or higher on the machine (MacOS has a default php. Install php if needed.)
+- Install composer globally with following script, see the [link](https://getcomposer.org/doc/00-intro.md) for details
+  - ```shell
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    php composer-setup.php
+    php -r "unlink('composer-setup.php');"
+    ```
+  - ```shell
+    sudo mv composer.phar /usr/local/bin/composer
+    ```
+- Install NVM with following script, see [link](https://github.com/nvm-sh/nvm) for details
+  - ```shell
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+    ```
+  - Make sure `.bashrc, .zshrc or .profile` file exist on your machine, and need to restart shell or run `source ~/.bashrc` 
+  - Verify NVM works by running `command -v nvm`, you will see `nvm` returned
+- Install nodejs and npm by running `nvm install --lts`
 - Clone the project, and start building by running following commands
   - `composer install`
   - `npm install`
   - `npm run prod`
+  - `cp .env.example .env`
+  - `php artisan key:generate`
   - `php artisan serve`
 - Go to the page here: http://127.0.0.1:8000
 
