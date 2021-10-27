@@ -71,6 +71,7 @@ export default {
                 api = "/api/app/feed_data/update_stale_data";
             axios.post(api, request).then(response => {
                 console.log(response.data);
+                window.alert("Update successfully. Check generated CSV and JSON files on server.");
             })
         }
     }
